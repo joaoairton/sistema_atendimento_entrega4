@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+
+<h2>Endpoints disponíveis</h2>
+<table>
+  <tr><th>Método</th><th>Endpoint</th><th>Descrição</th></tr>
+  <tr><td>GET</td><td>/api/pacientes</td><td>Lista todos os pacientes</td></tr>
+  <tr><td>GET</td><td>/api/pacientes/&lt;cpf&gt;</td><td>Busca paciente por CPF</td></tr>
+  <tr><td>GET</td><td>/api/pacientes/&lt;cpf&gt;/status-financeiro</td><td>Retorna o status financeiro do paciente</td></tr>
+  <tr><td>GET</td><td>/api/atendimentos</td><td>Lista todos os atendimentos</td></tr>
+  <tr><td>GET</td><td>/api/atendimentos/&lt;id&gt;</td><td>Detalhes de um atendimento</td></tr>
+  <tr><td>GET</td><td>/api/atendimentos/&lt;id&gt;/prescricoes</td><td>Prescrições com retorno do Estoque</td></tr>
+</table>
+
+<h2>Últimos atendimentos</h2>
+<table>
+  <tr><th>ID</th><th>Paciente</th><th>Tipo</th><th>Status</th><th>Data</th></tr>
+  {% for a in atendimentos %}
+  <tr>
+    <td>{{ a.id }}</td>
+    <td>{{ a.nome_paciente }}</td>
+    <td>{{ a.tipo }}</td>
+    <td>
+      {% if a.status == 'ABERTO' %}
+        <span class="badge-ok">ABERTO</span>
+      {% else %}
+        <span class="badge-info">FINALIZADO</span>
+      {% endif %}
+    </td>
+    <td>{{ a.data_abertura.strftime('%d/%m/%Y') }}</td>
+  </tr>
+  {% else %}
+  <tr><td colspan="5">Nenhum atendimento registrado.</td></tr>
+  {% endfor %}
+</table>
+{% endblock %}

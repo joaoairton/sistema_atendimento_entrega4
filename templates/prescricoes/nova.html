@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Nova Prescrição{% endblock %}
+{% block content %}
+<h1>Nova Prescrição &nbsp; Atendimento {{ atend.id }}</h1>
+<p><strong>Paciente:</strong> {{ atend.nome_paciente }}</p>
+<p style="font-size: 13px; color: #555; background: #e8f0fe; border-left: 3px solid #2e75b6; padding: 8px">
+  Ao registrar a prescrição, o sistema envia os dados ao Estoque via REST e exibe o retorno imediatamente.
+</p>
+<form method="post">
+  <label>Código do medicamento <input name="codigo_med" type="number" required min="1"></label>
+  <label>Quantidade <input name="quantidade" type="number" step="0.001" min="0.001" required></label>
+  <label>Unidade
+    <select name="unidade">
+      <option value="COMP">COMP</option>
+      <option value="ML">ML</option>
+      <option value="MG">MG</option>
+      <option value="UN">UN</option>
+    </select>
+  </label>
+  <label>CRM <input name="crm" maxlength="15" value="{{ atend.crm_medico or '' }}"></label>
+  <label>Instruções <textarea name="instrucoes" rows="2" maxlength="500"></textarea></label>
+  <button type="submit">Registrar e enviar ao Estoque</button>
+  <a href="/atendimentos/{{ atend.id }}" class="btn" style="margin-left: 10px">Cancelar</a>
+</form>
+
+{% if prescricoes %}
+<h2>Prescrições deste atendimento</h2>
+<table>
+  <tr><th>ID</th><th>Medicamento</th><th>Quantidade</th><th>Retorno do Estoque</th></tr>
+  {% for p in prescricoes %}
+  <tr>
+    <td>{{ p.id }}</td>
+    <td>{{ p.codigo_med }}</td>
+    <td>{{ p.quantidade }}</td>
+    <td>{{ p.status_estoque or 'Aguardando' }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endif %}
+{% endblock %}

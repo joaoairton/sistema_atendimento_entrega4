@@ -1,0 +1,27 @@
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: db_atendimento_rest
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./banco.sql:/docker-entrypoint-initdb.d/banco.sql
+    ports:
+      - "5432:5432"
+  app:
+    build: .
+    ports:
+      - "5002:5002"
+    environment:
+      DB_HOST: db
+      DB_NAME: db_atendimento_rest
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      ESTOQUE_URL: http://10.8.0.X:5003
+      FINANCEIRO_URL: http://10.8.0.Y:5004
+    depends_on:
+      - db
+volumes:
+  postgres_data:

@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Atendimento {{ atend.id }}{% endblock %}
+{% block content %}
+<h1>Atendimento {{ atend.id }} &nbsp; {{ atend.nome_paciente }}</h1>
+<table>
+  <tr><th>CPF</th><td>{{ atend.cpf_paciente[:3] }}.{{ atend.cpf_paciente[3:6] }}.{{ atend.cpf_paciente[6:9] }}-{{ atend.cpf_paciente[9:] }}</td></tr>
+  <tr><th>Tipo</th><td>{{ atend.tipo }}</td></tr>
+  <tr><th>Status</th><td>{{ atend.status }}</td></tr>
+  <tr><th>CRM</th><td>{{ atend.crm_medico or '' }}</td></tr>
+  <tr><th>Convênio</th><td>{{ atend.convenio or 'PARTICULAR' }}</td></tr>
+  <tr><th>Abertura</th><td>{{ atend.data_abertura.strftime('%d/%m/%Y') }} às {{ atend.hora_abertura.strftime('%H:%M') }}</td></tr>
+  {% if atend.status == 'FINALIZADO' %}
+  <tr><th>Encerramento</th><td>{{ atend.data_finalizacao.strftime('%d/%m/%Y') if atend.data_finalizacao else '' }}</td></tr>
+  <tr><th>CID</th><td>{{ atend.cid or '' }}</td></tr>
+  <tr><th>TUSS</th><td>{{ atend.codigo_tuss or '' }}</td></tr>
+  <tr><th>Valor total</th><td>R$ {{ '%.2f'|format(atend.valor_total or 0) }}</td></tr>
+  {% endif %}
+</table>
+
+{% if atend.status == 'ABERTO' %}
+<p style="margin-top: 15px">
+  <a href="/atendimentos/{{ atend.id }}/prescricao" class="btn">Nova prescrição</a>
+  {% if sem_retorno %}
+    <span style="margin-left: 10px; background: #fff3cd; border: 1px solid #ffc107; padding: 6px 12px; font-size: 13px">
+      {{ sem_retorno|length }} prescrição(ões) aguardando retorno do Estoque
+    </span>
+  {% else %}
+    <a href="/atendimentos/{{ atend.id }}/finalizar" class="btn btn-danger" style="margin-left: 10px">Finalizar atendimento</a>
+  {% endif %}
+</p>
+{% endif %}
+
+<h2>Prescrições</h2>
+<table>
+  <tr><th>ID</th><th>Medicamento</th><th>Quantidade</th><th>Retorno do Estoque</th><th>Observação</th><th>Data</th><th></th></tr>
+  {% for p in prescricoes %}
+  <tr>
+    <td>{{ p.id }}</td>
+    <td>{{ p.codigo_med }}</td>
+    <td>{{ p.quantidade }}</td>
+    <td>
+      {% if p.status_estoque in ('DISPONIVEL', 'SEPARADO') %}
+        <span class="badge-ok">{{ p.status_estoque }}</span>
+      {% elif p.status_estoque in ('INDISPONIVEL', 'ERRO') %}
+        <span class="badge-erro">{{ p.status_estoque }}</span>
+      {% elif p.status_estoque %}
+        <span class="badge-aviso">{{ p.status_estoque }}</span>
+      {% else %}
+        <span class="badge-info">Aguardando</span>
+      {% endif %}
+    </td>
+    <td>{{ p.obs_estoque or '' }}</td>
+    <td>{{ p.data_prescricao.strftime('%d/%m/%Y') }}</td>
+    <td>
+      {% if not p.status_estoque and atend.status == 'ABERTO' %}
+      <form method="post" action="/prescricoes/{{ p.id }}/reenviar" style="margin: 0">
+        <button type="submit" style="background: #c27803; color: #fff; border: none; padding: 3px 8px; font-size: 12px; cursor: pointer">Reenviar</button>
+      </form>
+      {% endif %}
+    </td>
+  </tr>
+  {% else %}
+  <tr><td colspan="7">Nenhuma prescrição registrada.</td></tr>
+  {% endfor %}
+</table>
+<a href="/atendimentos" class="btn" style="margin-top: 15px">Voltar</a>
+{% endblock %}

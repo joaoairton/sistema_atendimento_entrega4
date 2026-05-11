@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Editar Paciente{% endblock %}
+{% block content %}
+
+<h1>Editar Paciente</h1>
+
+<p><strong>CPF:</strong> {{ pac.cpf[:3] }}.{{ pac.cpf[3:6] }}.{{ pac.cpf[6:9] }}-{{ pac.cpf[9:] }}</p>
+
+<form method="post">
+  <label>Nome <input name="nome" required maxlength="100" value="{{ pac.nome }}"></label>
+  <label>Data de nascimento <input type="date" name="data_nasc" value="{{ pac.data_nasc or '' }}"></label>
+  <label>Telefone <input name="telefone" maxlength="20" value="{{ pac.telefone or '' }}"></label>
+  <label>E-mail <input type="email" name="email" maxlength="100" value="{{ pac.email or '' }}"></label>
+  <button type="submit">Salvar alterações</button>
+  <a href="/pacientes" class="btn" style="margin-left: 10px">Cancelar</a>
+</form>
+
+{% endblock %}
